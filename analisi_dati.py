@@ -3,15 +3,25 @@ import pandas as pd
 import numpy as np
 import os
 
-
 def get_mean(lines):
     mean = np.mean(lines["_value"])
     return mean
 
-
 def get_std(lines):
     std = np.std(lines["_value"])
     return std
+
+def remove_anomalies(lines):
+    mean = get_mean(lines)
+    std = get_std(lines)
+    cleaned_lines = lines[abs(lines["_value"] - mean) < 3 * std]
+    anomalies = len(lines) - len(cleaned_lines)
+    print(f'Sensore: {lines["entity_id"].iloc[0]}')
+    print(f'Media: {mean:.2f}')
+    print(f'STD: {std:.2f}')
+    print(f'Anomalie: {anomalies}')
+    print()
+    return cleaned_lines
 
 def main():
 
@@ -33,54 +43,17 @@ def main():
     lines["_value"] = pd.to_numeric(lines["_value"], errors="coerce")
     lines = lines.dropna(subset=["_value"])
 
-    acc_x = lines[lines["entity_id"] == "fridge_black_accel_x"]
-    acc_y = lines[lines["entity_id"] == "fridge_black_accel_y"]
-    acc_z = lines[lines["entity_id"] == "fridge_black_accel_z"]
-    gyro_x = lines[lines["entity_id"] == "fridge_black_gyro_x"]
-    gyro_y = lines[lines["entity_id"] == "fridge_black_gyro_y"]
-    gyro_z = lines[lines["entity_id"] == "fridge_black_gyro_z"]
-    temp = lines[lines["entity_id"] == "airq_black_temperature"]
-    temp_sen55 = lines[lines["entity_id"] == "airq_black_temperature_sen55"]
-    temp_cpu = lines[lines["entity_id"] == "fridge_black_internal_temperature"]
-    temp_probe = lines[lines["entity_id"] == "fridge_black_probe_temperature"]
+    acc_x = remove_anomalies(lines[lines["entity_id"] == "fridge_black_accel_x"])
+    acc_y = remove_anomalies(lines[lines["entity_id"] == "fridge_black_accel_y"])
+    acc_z = remove_anomalies(lines[lines["entity_id"] == "fridge_black_accel_z"])
+    gyro_x = remove_anomalies(lines[lines["entity_id"] == "fridge_black_gyro_x"])
+    gyro_y = remove_anomalies(lines[lines["entity_id"] == "fridge_black_gyro_y"])
+    gyro_z = remove_anomalies(lines[lines["entity_id"] == "fridge_black_gyro_z"])
+    temp = remove_anomalies(lines[lines["entity_id"] == "airq_black_temperature"])
+    temp_sen55 = remove_anomalies(lines[lines["entity_id"] == "airq_black_temperature_sen55"])
+    temp_cpu = remove_anomalies(lines[lines["entity_id"] == "fridge_black_internal_temperature"])
+    temp_probe = remove_anomalies(lines[lines["entity_id"] == "fridge_black_probe_temperature"])
 
-    sensors = [
-        acc_x,
-        acc_y,
-        acc_z,
-        gyro_x,
-        gyro_y,
-        gyro_z,
-        temp,
-        temp_sen55,
-        temp_cpu,
-        temp_probe,
-    ]
-
-    total_anomalies = 0
-    anomalies = 0
-
-    for sensor in sensors:
-        mean = get_mean(sensor)
-        std = get_std(sensor)
-        print(f'{sensor["entity_id"].iloc[0]} \nMEDIA: {mean} \nSTD: {std}')
-
-        print(f'total lines: {len(sensor)}')
-
-        for line in sensor.itertuples():
-            if abs(line._2 - mean) > 3 * std:
-                print(f"Valore anomalo: {line._2}")
-                anomalies += 1
-                total_anomalies += 1
-
-        sensor = sensor[abs(sensor["_value"] - mean) < 3 * std]
-
-        print(f'lines after cleaning: {len(sensor)}')
-        print(f'anomalies: {anomalies}')
-        anomalies = 0
-        print()
-
-    print(total_anomalies)
 
 if __name__ == "__main__":
     main()
