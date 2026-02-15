@@ -1,54 +1,51 @@
-'''
-acc x
-acc y
-acc z
-gyro x
-gyro y
-gyro z
-temp ((sen55+scd40)/2)
-temp sen55
-temp internal (cpu)
-temp probe
-'''
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import os
 
 def main():
 
-    columns = [
-        'extra_1', 'result', 'table', 'start', 'stop', 
-        'time', 'value', 'field', 'measurement', 'domain', 'sensor_id'
-    ]
-    
-    lines  = pd.read_csv(
-        'log_monitoraggio_25-07-2022.csv',
-        names=columns,
-        parse_dates=['time'],
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, 'log_monitoraggio_25-07-2022.csv')
+
+    if not os.path.exists(csv_path):
+        print(f"Errore: Il file '{csv_path}' non esiste.")
+        return
+
+    lines = pd.read_csv(
+        csv_path,
         comment='#',
-        skipinitialspace=True,
-        dtype={'value': float}
+        usecols=['_time', '_value', 'entity_id'],
+        skipinitialspace=True
     )
 
+    lines['_time'] = pd.to_datetime(lines['_time'], format='ISO8601', utc=True)
+    lines['_value'] = pd.to_numeric(lines['_value'], errors='coerce')
+    lines = lines.dropna(subset=['_value'])
 
-    acc_x_lines = lines[lines['table'] == '0']
-    acc_y_lines = lines[lines['table'] == '1']
-    acc_z_lines = lines[lines['table'] == '2']
-    gyro_x_lines = lines[lines['table'] == '3']
-    gyro_y_lines = lines[lines['table'] == '4']
-    gyro_z_lines = lines[lines['table'] == '5']
-    temp_lines = lines[lines['table'] == '6']
-    temp_sen55_lines = lines[lines['table'] == '7']
-    temp_cpu_lines = lines[lines['table'] == '8']
-    temp_probe_lines = lines[lines['table'] == '9']
+    acc_x_lines = lines[lines['entity_id'] == 'fridge_black_accel_x']
+    acc_y_lines = lines[lines['entity_id'] == 'fridge_black_accel_y']
+    acc_z_lines = lines[lines['entity_id'] == 'fridge_black_accel_z']
+    gyro_x_lines = lines[lines['entity_id'] == 'fridge_black_gyro_x']
+    gyro_y_lines = lines[lines['entity_id'] == 'fridge_black_gyro_y']
+    gyro_z_lines = lines[lines['entity_id'] == 'fridge_black_gyro_z']
+    temp_lines = lines[lines['entity_id'] == 'airq_black_temperature']
+    temp_sen55_lines = lines[lines['entity_id'] == 'airq_black_temperature_sen55']
+    temp_cpu_lines = lines[lines['entity_id'] == 'fridge_black_internal_temperature']
+    temp_probe_lines = lines[lines['entity_id'] == 'fridge_black_probe_temperature']
 
-    print(acc_x_lines[['time']])
+    print(len(lines))
+    print(len(acc_x_lines))
+    print(len(acc_y_lines))
+    print(len(acc_z_lines))
+    print(len(gyro_x_lines))
+    print(len(gyro_y_lines))
+    print(len(gyro_z_lines))
+    print(len(temp_lines))
+    print(len(temp_sen55_lines))
+    print(len(temp_cpu_lines))
+    print(len(temp_probe_lines))
 
-    fig, acc_x = plt.subplots()
-    acc_x.plot(acc_x_lines['time'], acc_x_lines['value'])
-    plt.tight_layout()
-    plt.show()
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
