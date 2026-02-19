@@ -80,11 +80,11 @@ def main():
             ax.legend(fontsize=7, loc="upper right", frameon=True, framealpha=1, edgecolor='black')
 
     acc_ax = axes[-1]
-    acc_ax.plot(acc_y['_time'], acc_y['_value'], linewidth=0.3, color='blue', label='Acc Y')
+    line1 = acc_ax.plot(acc_y['_time'], acc_y['_value'], linewidth=0.3, color='blue', label='Acc Y')
     acc_ax.set_ylabel("Acc Y", fontsize=8)
 
     temp_ax = acc_ax.twinx()
-    temp_ax.plot(temp_avg['_time'], temp_avg['_value'], linewidth=1, color='red', label='Temp')
+    line2 = temp_ax.plot(temp_avg['_time'], temp_avg['_value'], linewidth=1, color='red', label='Temp')
     temp_ax.set_ylabel("Temp", fontsize=8)
 
     # temp_prob_ax = acc_ax.twinx()
