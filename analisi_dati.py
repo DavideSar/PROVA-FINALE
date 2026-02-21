@@ -27,21 +27,18 @@ def remove_anomalies(lines):
     return cleaned_lines
 
 
-def make_graph(graph, value1, value2, label):
-    line1 = graph.plot(value1["_time"], value1["_value"], linewidth=1, color="red", label=label)
-    graph.set_ylabel(label, fontsize=8)
+def make_graph(graph, value1, label1, linewidth1, value2, label2, linewidth2):
+    line1 = graph.plot(value1["_time"], value1["_value"], linewidth=linewidth1, color="red", label=label1)
+    graph.set_ylabel(label1, fontsize=8)
 
-    acc_ax = graph.twinx()
-    line2 = acc_ax.plot(
-        value2["_time"], value2["_value"], linewidth=0.2, color="blue", label="Acc Y"
-    )
-    acc_ax.set_ylabel("Acc Y", fontsize=8)
+    graph_twin = graph.twinx()
+    line2 = graph_twin.plot(value2["_time"], value2["_value"], linewidth=linewidth2, color="blue", label=label2)
+    graph_twin.set_ylabel(label2, fontsize=8)
 
     # Set legend
-    label_lines = line1 + line2
-    labels = [line.get_label() for line in label_lines]
+    labels = [line.get_label() for line in (line1 + line2)]
     graph.legend(
-        label_lines,
+        line1 + line2,
         labels,
         fontsize=10,
         loc="upper right",
@@ -86,31 +83,19 @@ def main():
     # temp_cpu = remove_anomalies(lines[lines["entity_id"] == "fridge_black_internal_temperature"])
 
     acc_y = remove_anomalies(lines[lines["entity_id"] == "fridge_black_accel_y"])
-    acc_y = (
-        acc_y.groupby(np.arange(len(acc_y)) // 3)
-        .agg({"_time": "first", "_value": "mean", "entity_id": "first"})
-        .reset_index(drop=True)
-    )
     temp_avg = remove_anomalies(lines[lines["entity_id"] == "airq_black_temperature"])
-    temp_probe = remove_anomalies(
-        lines[lines["entity_id"] == "fridge_black_probe_temperature"]
-    )
-    temp_probe = (
-        temp_probe.groupby(np.arange(len(temp_probe)) // 3)
-        .agg({"_time": "first", "_value": "mean", "entity_id": "first"})
-        .reset_index(drop=True)
-    )
+    temp_probe = remove_anomalies(lines[lines["entity_id"] == "fridge_black_probe_temperature"])
 
-    fig, (temp_acc_ax, probe_acc_ax) = plt.subplots(
-        nrows=2, ncols=1, figsize=(14, 20), sharex=True
-    )
+    fig, (temp_acc, probe_acc, avg_prob) = plt.subplots(nrows=3, ncols=1, figsize=(14, 20), sharex=True)
 
-    make_graph(temp_acc_ax, temp_avg, acc_y, 'Ext Temp')
-    make_graph(probe_acc_ax, temp_probe, acc_y, 'Fridge Temp')
+    make_graph(temp_acc, temp_avg, "Ext Temp", 1, acc_y, "Acc Y", 0.3)
+    make_graph(probe_acc, temp_probe, "Fridge Temp", 0.7, acc_y, "Acc Y", 0.3)
+    make_graph(avg_prob, temp_avg, "Ext Temp", 1, temp_probe, "Probe Temp", 0.5)
 
-    fig.suptitle("Sensors Data - 25/07/2022", fontsize=14, fontweight="bold", y=1)
-    probe_acc_ax.set_xlabel("Time")
-    plt.tight_layout()
+    temp_acc.set_title("External Temperature vs Acc Y", fontsize=16)
+    probe_acc.set_title("Probe Temperature vs Acc Y", fontsize=16)
+    avg_prob.set_title("External vs Probe Temperature", fontsize=16)
+    avg_prob.set_xlabel("Time")
     plt.show()
 
 if __name__ == "__main__":
