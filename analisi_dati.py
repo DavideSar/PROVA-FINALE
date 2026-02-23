@@ -30,11 +30,13 @@ def get_variance(lines):
     return variance
 
 
+# Standard error of the mean
 def get_sem(lines):
     sem = get_std(lines) / np.sqrt(len(lines))
     return sem
 
 
+# Remove anomalies based on Standard Deviation
 def remove_anomalies(lines):
     mean = get_mean(lines)
     std = get_std(lines)
@@ -90,7 +92,7 @@ def make_graph(graph, value1, label1, linewidth1, color1, value2, label2, linewi
         edgecolor="black",
     )
 
-    # Set grid and x ticks
+    # Set grid and X ticks
     graph.minorticks_on()
     graph.grid(which="major", linestyle="-", linewidth="0.8", color="black", alpha=0.3)
     graph.grid(which="minor", linestyle=":", linewidth="0.5", color="black", alpha=0.2)
@@ -115,13 +117,16 @@ def print_stats(lines, color):
 
 def main():
 
+    # Define file path
     script_dir = os.path.dirname(os.path.abspath(__file__))
     csv_path = os.path.join(script_dir, "log_monitoraggio_25-07-2022.csv")
 
+    # File existance check
     if not os.path.exists(csv_path):
         print(f"Errore: Il file {csv_path} non esiste.")
         return
 
+    # Data acquisition from file
     lines = pd.read_csv(
         csv_path,
         comment="#",
@@ -129,10 +134,14 @@ def main():
         skipinitialspace=True,
     )
 
+    # Date conversion from strings
     lines["_time"] = pd.to_datetime(lines["_time"], format="mixed", utc=True)
+    # Converions of value from string to numeric value, and deletion of errors
     lines["_value"] = pd.to_numeric(lines["_value"], errors="coerce")
+    # Deletion of rows with errors
     lines = lines.dropna(subset=["_value"])
 
+    # Unused data
     # acc_x = remove_anomalies(lines[lines["entity_id"] == "fridge_black_accel_x"])
     # acc_z = remove_anomalies(lines[lines["entity_id"] == "fridge_black_accel_z"])
     # gyro_x = remove_anomalies(lines[lines["entity_id"] == "fridge_black_gyro_x"])
@@ -141,32 +150,38 @@ def main():
     # temp_sen55 = remove_anomalies(lines[lines["entity_id"] == "airq_black_temperature_sen55"])
     # temp_cpu = remove_anomalies(lines[lines["entity_id"] == "fridge_black_internal_temperature"])
 
+    # Slip data based on sensor type and get cleaned data
     acc_y = remove_anomalies(lines[lines["entity_id"] == "fridge_black_accel_y"])
     temp_avg = remove_anomalies(lines[lines["entity_id"] == "airq_black_temperature"])
     temp_probe = remove_anomalies(lines[lines["entity_id"] == "fridge_black_probe_temperature"])
 
+    # Print data stats after cleaning
     print("Statistiche dei sensori dopo la rimozione delle anomalie:\n")
     print_stats(acc_y, "\33[34m")
     print_stats(temp_avg, "\33[31m")
     print_stats(temp_probe, "\33[32m")
 
+    # Define graph style
     plt.rcParams["font.family"] = "Arial"
     plt.rcParams["font.size"] = 11
     plt.rcParams["axes.titlesize"] = 13
     plt.rcParams["axes.labelsize"] = 11
 
+    # Degine graph windows
     fig, (temp_acc, probe_acc, avg_prob) = plt.subplots(
         nrows=3, ncols=1, figsize=(14, 20), sharex=True
     )
 
+    # Create graphs
     make_graph(temp_acc, temp_avg, "Ext Temp", 1, "red", acc_y, "Acc Y", 0.3, "blue")
     make_graph(probe_acc, temp_probe, "Probe Temp", 0.7, "green", acc_y, "Acc Y", 0.3, "blue")
     make_graph(avg_prob, temp_avg, "Ext Temp", 1, "red", temp_probe, "Probe Temp", 0.5, "green")
 
+    # Set graph titles
     temp_acc.set_title("External Temperature vs Acc Y")
     probe_acc.set_title("Probe Temperature vs Acc Y")
     avg_prob.set_title("External vs Probe Temperature")
-    avg_prob.set_xlabel("Time")
+    avg_prob.set_xlabel("Time") # X-axis label only on last (sharex=True)
     plt.show()
 
 
