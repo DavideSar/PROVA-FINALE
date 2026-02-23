@@ -13,15 +13,25 @@ def get_std(lines):
     std = np.std(lines["_value"])
     return std
 
+def get_mode(lines):
+    values, counts = np.unique(lines['_value'].values, return_counts=True)
+    mode = values[np.argmax(counts)]
+    return mode
+
+def get_variance(lines):
+    variance = np.var(lines['_value'].values)
+    return variance
+
+def get_sem(lines):
+    sem = get_std(lines) / np.sqrt(len(lines))
+    return sem
 
 def remove_anomalies(lines):
     mean = get_mean(lines)
     std = get_std(lines)
-    cleaned_lines = lines[abs(lines["_value"] - mean) < 3 * std]
+    cleaned_lines = lines[abs(lines["_value"] - mean) < 2 * std]
     anomalies = len(lines) - len(cleaned_lines)
     print(f'Sensore: {lines["entity_id"].iloc[0]}')
-    print(f"Media: {mean:.2f}")
-    print(f"STD: {std:.2f}")
     print(f"Anomalie: {anomalies}")
     print()
     return cleaned_lines
@@ -80,6 +90,16 @@ def make_graph(
     return graph
 
 
+def print_stats(lines):
+    print(f'Sensore: {lines["entity_id"].iloc[0]}')
+    print(f"Media: {get_mean(lines)}")
+    print(f"Moda: {get_mode(lines)}")
+    print(f"STD: {get_std(lines)}")
+    print(f"Errore standard della media: {get_sem(lines)}")
+    print(f"Varianza: {get_variance(lines)}")
+    print()
+
+
 def main():
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -111,6 +131,10 @@ def main():
     acc_y = remove_anomalies(lines[lines["entity_id"] == "fridge_black_accel_y"])
     temp_avg = remove_anomalies(lines[lines["entity_id"] == "airq_black_temperature"])
     temp_probe = remove_anomalies(lines[lines["entity_id"] == "fridge_black_probe_temperature"])
+
+    print_stats(acc_y)
+    print_stats(temp_avg)
+    print_stats(temp_probe)
 
     plt.rcParams["font.family"] = "Arial"
     plt.rcParams["font.size"] = 11
