@@ -15,13 +15,18 @@ def get_std(lines):
 
 
 def get_mode(lines):
-    values, counts = np.unique(lines['_value'].values, return_counts=True)
+    values, counts = np.unique(lines["_value"].values, return_counts=True)
     mode = values[np.argmax(counts)]
     return mode
 
 
+def get_median(lines):
+    median = np.median(lines["_value"].values)
+    return median
+
+
 def get_variance(lines):
-    variance = np.var(lines['_value'].values)
+    variance = np.var(lines["_value"].values)
     return variance
 
 
@@ -43,7 +48,7 @@ def remove_anomalies(lines):
 
 
 def make_graph(graph, value1, label1, linewidth1, color1, value2, label2, linewidth2, color2):
-    
+
     # First graph plot
     line1 = graph.plot(
         value1["_time"],
@@ -69,7 +74,7 @@ def make_graph(graph, value1, label1, linewidth1, color1, value2, label2, linewi
     graph_twin.spines["right"].set_color(color2)    # Color right Y-axis
     graph_twin.spines["left"].set_color(color1)     # Color left Y-axis
 
-    # X-axis ticks
+    # X-axis ticks definition
     times = pd.concat([value1["_time"], value2["_time"]]).sort_values().unique()
     x_ticks = pd.date_range(times[0], times[-1], freq="2h")
     x_ticks_minor = pd.date_range(times[0], times[-1], freq="30min")
@@ -85,7 +90,7 @@ def make_graph(graph, value1, label1, linewidth1, color1, value2, label2, linewi
         edgecolor="black",
     )
 
-    # Set grid
+    # Set grid and x ticks
     graph.minorticks_on()
     graph.grid(which="major", linestyle="-", linewidth="0.8", color="black", alpha=0.3)
     graph.grid(which="minor", linestyle=":", linewidth="0.5", color="black", alpha=0.2)
@@ -97,13 +102,14 @@ def make_graph(graph, value1, label1, linewidth1, color1, value2, label2, linewi
     return graph
 
 
-def print_stats(lines):
-    print(f'Sensore: {lines["entity_id"].iloc[0]}')
-    print(f"Media: {get_mean(lines)}")
-    print(f"Moda: {get_mode(lines)}")
-    print(f"STD: {get_std(lines)}")
-    print(f"Errore standard della media: {get_sem(lines)}")
-    print(f"Varianza: {get_variance(lines)}")
+def print_stats(lines, color):
+    print("Sensore: " + color + f" {lines['entity_id'].iloc[0]} " + "\33[0m")
+    print(f"Media...............{get_mean(lines):.3f}")
+    print(f"Mediana.............{get_median(lines):.3f}")
+    print(f"Moda................{get_mode(lines):.3f}")
+    print(f"Varianza............{get_variance(lines):.3f}")
+    print(f"STD.................{get_std(lines):.3f}")
+    print(f"Err std su media....{get_sem(lines):.3f}")
     print()
 
 
@@ -139,9 +145,10 @@ def main():
     temp_avg = remove_anomalies(lines[lines["entity_id"] == "airq_black_temperature"])
     temp_probe = remove_anomalies(lines[lines["entity_id"] == "fridge_black_probe_temperature"])
 
-    print_stats(acc_y)
-    print_stats(temp_avg)
-    print_stats(temp_probe)
+    print("Statistiche dei sensori dopo la rimozione delle anomalie:\n")
+    print_stats(acc_y, "\33[34m")
+    print_stats(temp_avg, "\33[31m")
+    print_stats(temp_probe, "\33[32m")
 
     plt.rcParams["font.family"] = "Arial"
     plt.rcParams["font.size"] = 11
