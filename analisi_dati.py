@@ -13,33 +13,38 @@ def get_std(lines):
     std = np.std(lines["_value"])
     return std
 
+
 def get_mode(lines):
     values, counts = np.unique(lines['_value'].values, return_counts=True)
     mode = values[np.argmax(counts)]
     return mode
 
+
 def get_variance(lines):
     variance = np.var(lines['_value'].values)
     return variance
+
 
 def get_sem(lines):
     sem = get_std(lines) / np.sqrt(len(lines))
     return sem
 
+
 def remove_anomalies(lines):
     mean = get_mean(lines)
     std = get_std(lines)
     cleaned_lines = lines[abs(lines["_value"] - mean) < 2 * std]
-    anomalies = len(lines) - len(cleaned_lines)
-    print(f'Sensore: {lines["entity_id"].iloc[0]}')
-    print(f"Anomalie: {anomalies}")
-    print()
+    # Debug anomalies
+    # anomalies = len(lines) - len(cleaned_lines)
+    # print(f'Sensore: {lines["entity_id"].iloc[0]}')
+    # print(f"Anomalie: {anomalies}")
+    # print()
     return cleaned_lines
 
 
-def make_graph(
-    graph, value1, label1, linewidth1, color1, value2, label2, linewidth2, color2
-):
+def make_graph(graph, value1, label1, linewidth1, color1, value2, label2, linewidth2, color2):
+    
+    # First graph plot
     line1 = graph.plot(
         value1["_time"],
         value1["_value"],
@@ -50,6 +55,7 @@ def make_graph(
     graph.set_ylabel(label1, color=color1)
     graph.tick_params(axis="y", colors=color1)
 
+    # Second graph plot
     graph_twin = graph.twinx()
     line2 = graph_twin.plot(
         value2["_time"],
@@ -60,9 +66,10 @@ def make_graph(
     )
     graph_twin.set_ylabel(label2, color=color2)
     graph_twin.tick_params(axis="y", colors=color2)
-    graph_twin.spines["right"].set_color(color2)
-    graph_twin.spines["left"].set_color(color1)
+    graph_twin.spines["right"].set_color(color2)    # Color right Y-axis
+    graph_twin.spines["left"].set_color(color1)     # Color left Y-axis
 
+    # X-axis ticks
     times = pd.concat([value1["_time"], value2["_time"]]).sort_values().unique()
     x_ticks = pd.date_range(times[0], times[-1], freq="2h")
     x_ticks_minor = pd.date_range(times[0], times[-1], freq="30min")
@@ -146,12 +153,8 @@ def main():
     )
 
     make_graph(temp_acc, temp_avg, "Ext Temp", 1, "red", acc_y, "Acc Y", 0.3, "blue")
-    make_graph(
-        probe_acc, temp_probe, "Probe Temp", 0.7, "green", acc_y, "Acc Y", 0.3, "blue"
-    )
-    make_graph(
-        avg_prob, temp_avg, "Ext Temp", 1, "red", temp_probe, "Probe Temp", 0.5, "green"
-    )
+    make_graph(probe_acc, temp_probe, "Probe Temp", 0.7, "green", acc_y, "Acc Y", 0.3, "blue")
+    make_graph(avg_prob, temp_avg, "Ext Temp", 1, "red", temp_probe, "Probe Temp", 0.5, "green")
 
     temp_acc.set_title("External Temperature vs Acc Y")
     probe_acc.set_title("Probe Temperature vs Acc Y")
