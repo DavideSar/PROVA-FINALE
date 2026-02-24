@@ -6,7 +6,7 @@ This project analyzes sensor data from a monitoring CSV file. It includes implem
 
 ## Features
 - **CSV Data Parsing**: Reads and processes monitoring data from CVS file, checking for correct data types.
-- **Clean Anomalies**: Based on mean and STD clean anomalies following the equation $\left|value-mean\right|< 3*std$
+- **Clean Anomalies**: Based on mean and STD clean anomalies following the equation $\left|value-mean\right|< 2*std$
 - **Statistical Analysis**:
     - Mean - average value
     - Median - middle value
