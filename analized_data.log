@@ -1,0 +1,24 @@
+Sensore: fridge_black_accel_y
+  Media................-0.036
+  Mediana..............-0.033
+  Moda.................-0.022
+  Varianza.............0.006
+  STD..................0.079
+  Err std su media.....0.002
+
+Sensore: airq_black_temperature
+  Media................31.393
+  Mediana..............31.354
+  Moda.................31.109
+  Varianza.............0.471
+  STD..................0.686
+  Err std su media.....0.008
+
+Sensore: fridge_black_probe_temperature
+  Media................-6.647
+  Mediana..............-6.625
+  Moda.................-6.438
+  Varianza.............0.043
+  STD..................0.207
+  Err std su media.....0.007
+
