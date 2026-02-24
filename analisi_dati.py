@@ -58,6 +58,8 @@ def make_graph(graph, value1, label1, linewidth1, color1, value2, label2, linewi
         linewidth=linewidth1,
         color=color1,
         label=label1,
+        marker=".",
+        markersize=3,
     )
     graph.set_ylabel(label1, color=color1)
     graph.tick_params(axis="y", colors=color1)
@@ -70,6 +72,8 @@ def make_graph(graph, value1, label1, linewidth1, color1, value2, label2, linewi
         linewidth=linewidth2,
         color=color2,
         label=label2,
+        marker=".",
+        markersize=3,
     )
     graph_twin.set_ylabel(label2, color=color2)
     graph_twin.tick_params(axis="y", colors=color2)
@@ -173,9 +177,9 @@ def main():
     )
 
     # Create graphs
-    make_graph(temp_acc, temp_avg, "Ext Temp", 1, "red", acc_y, "Acc Y", 0.3, "blue")
+    make_graph(temp_acc, temp_avg, "Ext Temp", 0.3, "red", acc_y, "Acc Y", 0.3, "blue")
     make_graph(probe_acc, temp_probe, "Probe Temp", 0.7, "green", acc_y, "Acc Y", 0.3, "blue")
-    make_graph(avg_prob, temp_avg, "Ext Temp", 1, "red", temp_probe, "Probe Temp", 0.5, "green")
+    make_graph(avg_prob, temp_avg, "Ext Temp", 0.3, "red", temp_probe, "Probe Temp", 0.5, "green")
 
     # Set graph titles
     temp_acc.set_title("External Temperature vs Acc Y")
