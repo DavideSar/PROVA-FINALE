@@ -2,7 +2,7 @@
 # Data Analysis Project - Sensor Monitoring
 
 ## Overview
-This project analyzes sensor data from a monitoring log file. It includes implementations in both **C** and **Python** that perform statistical analysis on data from sensors.
+This project analyzes sensor data from a monitoring CSV file. It includes implementations in both **C** and **Python** that perform statistical analysis on data from sensors.
 
 ## Features
 - **CSV Data Parsing**: Reads and processes monitoring data from CVS file, checking for correct data types.
