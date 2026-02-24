@@ -7,11 +7,11 @@ This project analyzes sensor data from a monitoring CSV file. It includes implem
 ## Features
 - **CSV Data Parsing**: Reads and processes monitoring data from CVS file, checking for correct data types.
 - **Statistical Analysis**:
-    - mean (average value)
-    - median (middle value)
-    - mode (most frequent value)
-    - variance and standard deviation (data spread)
-    - and standard error on mean (confidence in the mean estimate).
+    - Mean - average value
+    - Median - middle value
+    - Mode - most frequent value
+    - Variance and Standard Deviation (STD) - data spread (lower is better)
+    - Standard Error on Mean (SEM) - confidence in the mean estimate (lower is better)
 - **Visualization**: Python version includes multi-axis time-series graphs.
 - **Dual Output**: Console display and file logging (C version).
 
