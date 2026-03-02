@@ -20,12 +20,13 @@ This project analyzes sensor data from a monitoring CSV file. It includes implem
 - `analisi_dati.c` - C implementation with statistical functions, print stats on terminale and produces log file.
 - `analisi_dati.py` - Python implementation with matplotlib visualization, also print stats on terminal.
 
-## Sensors Tracked
+## Sensors
+### Tracked
 - `fridge_black_accel_y` - Refrigerator Y-axis acceleration (m/s²), identifies accension of fridge motor.
 - `airq_black_temperature` - Identifies external air temperature (°C).
 - `fridge_black_probe_temperature` - Identifies internal probe temperature (°C).
 
-## Sensors NOT Tracked
+### NOT Tracked
 - `fridge_black_accel_x` and `fridge_black_accel_z` - Refrigerator X and Z axis acceleration not relevant, Z alway flat, X always -9.8 (gravity).
 - `fridge_black_gyro_x/y/z` - Refrigeretor gyroscope, data is not relevant.
 - `airq_black_temperature_sen55` - External temperature sensor, same as `airq_black_temperature`, duplicate not relevant.
